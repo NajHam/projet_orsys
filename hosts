@@ -1,0 +1,9 @@
+[projet]
+
+localhost ansible_connection=local ansible_user=ansible ansible_hosts=172.19.10.222
+
+172.19.10.220
+
+[test]
+
+172.19.10.77

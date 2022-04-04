@@ -1,0 +1,13 @@
+---
+- name: Utilisation module crone
+  hosts: test
+  become: yes
+  tasks:
+    - name: Planification du tache des MAJ du paquet
+      cron:
+        name: MAJ du paquet 
+        user: ansible
+        job: "apt update && apt upgrade  > /home/ansible/projet/cron.d"
+        hour: "01"
+        minute: 0
+

@@ -1,0 +1,18 @@
+---
+- name: Déployer role haproxy pour équilibrer le charge de la machine totale
+  hosts: all
+  gather_facts: yes
+  vars:
+    haproxy_backend_servers:
+      - name: server1
+        address: 172.19.10.77:80
+      - name: server2
+        address: 172.19.10.222:8080
+     # haproxy utilise le port 80 == il faut que la machine contenant haproxy ne soit pas
+     # une machine des serveurs de backend
+     # netstat -tanpu grep 80 == savoir si 80 est utilisé
+     # 172.19.10.77
+  roles:
+    - haproxy-role 
+
+

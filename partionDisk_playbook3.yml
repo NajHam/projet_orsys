@@ -1,0 +1,58 @@
+---
+- name: Création des Partition du disk Formater et les Monter automatiquement
+  hosts: projet 
+  gather_facts: true
+  become: yes
+
+  tasks:
+    - name: Create a first partition in disk of 100Mo
+      parted:
+              #label: P1
+        device: /dev/sdd
+        number: 1
+        part_end: 100MiB
+        state: present
+    - name: Create a second partition in disk of 100Mo
+      parted:
+              #label: P2
+        device: /dev/sdd
+        number: 2
+        part_start: 100MiB
+        part_end: 200MiB
+        state: present
+    - name: create vg
+      lvg:
+        vg: vg1_naj
+        pvs: /dev/sdd1,/dev/sdd2
+        state: present
+        #      when: (ansible_devices.sdd.partitions.sdd1 is defined) and (ansible_devices.sdd.partitions.sdd2 is defined)
+    - name: Créer un volume logique du 120Mo
+      lvol:
+        vg: vg1_naj
+        lv: lv1
+        size: 120M
+        force: yes
+        #    when: (ansible_lvm.vgs.vg1_naj is defined) and ((ansible_lvm.vgs.vg1_naj.size_g | float) > 120)
+    - name: Send message if the volume de groupe is not enough
+      debug:
+        msg: "Espace insuffisant de volume de groupe"
+      when: ansible_lvm.vgs.vg1_naj.size_g | float < 120
+    - name: Formater volume logique en xfs filesystem pour tous les partitions
+      filesystem:
+        fstype: ext4
+        dev: /dev/vg1_naj/lv1
+        state: present
+        #- name: Récupère le UUID du partition logique
+        #command: sudo blkid /dev/vg1_naj/lv1
+        #register: uid
+    - name: mount volume logique
+      mount:
+        path: /logical/
+        src: /dev/vg1_naj/lv1
+        state: mounted
+        fstype: ext4 
+     
+
+
+
+

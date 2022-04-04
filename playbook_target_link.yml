@@ -1,0 +1,10 @@
+---
+- name: Créer un lien symbolique - symbolic link - entre 2 fichier
+  hosts: projet
+  become: yes
+  tasks: 
+    - name: Créer un lien symbolique entre default et graphical target
+      file:
+        dest: /etc/systemd/system/default.target  #le fichier default.target à créer est un lien symbolique
+        src: /usr/lib/systemd/system/graphical.target # le target à cible
+        state: link  #le fichier default.target à créer est un lien symbolique

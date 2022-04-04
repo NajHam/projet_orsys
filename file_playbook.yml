@@ -1,0 +1,25 @@
+- name: création du fichier type dans le repertoir /etc
+  hosts: all
+  become: true
+  tasks:
+    - name: Créer et remplir le fichier type du groupe projet
+      lineinfile:
+        path: /etc/type
+        state: present 
+        owner: root
+        group: root
+        mode: 0755
+        line: "developpement"
+        create: yes
+      when: "'projet' in group_names"
+    - name: Créer et remplir le fichier type du groupe test
+      lineinfile:
+        path: /etc/type
+        state: present
+        owner: root
+        group: root
+        mode: 0755
+        line: "test"
+        create: yes
+      when: "'test' in group_names"
+      

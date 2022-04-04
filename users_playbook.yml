@@ -1,0 +1,35 @@
+---
+- name: "Playbook for users"
+  hosts:
+    - test
+    - projet
+  become: yes
+  vars_files:
+    - utilisateurs.yml
+    - passwords.yml
+  tasks:
+    - name: "Création du groupe projet"
+      group:
+        name: dev
+        state: present
+        # Si le noeud cible est dans le groupe du projet qui contient tous les projets
+      when: ('projet' in group_names) 
+    - name: "Création du groupe test"
+      group:
+        name: test
+      when: ('test' in group_names)
+    - name: "Création des utilisateurs dev"
+      user:
+        name: "{{ item.Nom }}"
+        group: dev
+        password: "{{ mdp_dev | password_hash('sha512') }}"
+      when: ('projet' in group_names) and (item.Type == "dev")
+      loop: "{{ Utilisateurs }}"
+    - name: "Création des utilisateurs test"
+      user:
+        name: "{{ item.Nom }}"
+        groups: test
+        password: "{{ mdp_test | password_hash('sha512') }}"
+      when: ('test' in group_names) and (item.Type == "test") 
+      loop: "{{ Utilisateurs }}"
+

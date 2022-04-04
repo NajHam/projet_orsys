@@ -1,0 +1,69 @@
+---
+- name: Installer httpd et apache2 pour groupe projet et test et personnaliser page d'index 
+  hosts: all
+  
+  tasks:
+    - name: "Mettre à jour tous les paquets, installationde httpd et  Personnalisation de  la page d'accueil pour le groupe projet"
+      block:
+       #- name: "1) Mettre à jour tous les paquets" 
+        #   yum:
+          #   name: "*"
+            # state: latest
+        - name: "2) installationde httpd" 
+          yum:
+            name: httpd
+            state: latest
+          notify: httpd_restart 
+            
+        - name: "3) Personnalisation de  la page d'accueil"
+          template:
+            src: /home/ansible/projet/templates/index.j2
+            dest: /etc/motd 
+            owner: root
+            group: root
+            mode: 0655
+            
+      when: "'projet' in group_names"
+    
+    
+    - name: "Mettre à jour tous les paquets, installationde httpd et  Personnalisation de  la page d'accueil pour le groupe test"
+ 
+      block:
+        # - name: "1) Mettre à jour tous les paquets"
+          # apt:
+            # name: "*"
+            # state: latest
+            # ignore_errors: yes
+
+        - name: "2) installation d apache2"    
+          apt:
+            name: apache2
+            state: latest
+          notify: apache2_restart
+        
+        - name: "3) Personnalisation de  la page d'accueil"
+          template:
+            src: /home/ansible/projet/templates/index.j2
+            dest: /etc/motd
+            owner: root 
+            group: root
+            mode: 0655
+
+      when: "'test' in group_names"
+
+
+# On peut mettre le module template en dehors des block: une seule fois pour les deux
+
+
+  handlers:
+    - name: httpd_restart
+      service:
+        name: httpd
+        state: restarted
+    
+    - name: apache2_restart
+      service:
+        name: apache2
+        state: restarted
+
+
